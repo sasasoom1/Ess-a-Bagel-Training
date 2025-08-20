@@ -1,0 +1,99 @@
+<!-- Add this to the login screen after the existing buttons -->
+<div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+    <h3 style="color: #083915;">Share This Training</h3>
+    <button class="btn warning" onclick="generateShareLink()">📤 Generate Share Link</button>
+    <button class="btn" onclick="generateQRCode()">📱 Generate QR Code</button>
+    <button class="btn secondary" onclick="downloadTraining()">💾 Download Training File</button>
+</div>
+
+<!-- Add this modal for sharing -->
+<div id="shareModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Share Training System</h2>
+        <div id="shareContent">
+            <div class="form-group">
+                <label class="form-label">Direct Link (if hosted online):</label>
+                <input type="text" id="shareUrl" class="input-field" readonly onclick="this.select()" />
+                <button class="btn small" onclick="copyToClipboard('shareUrl')">📋 Copy Link</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">QR Code for Mobile Access:</label>
+                <div id="qrCodeContainer" style="text-align: center; margin: 20px 0;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Template:</label>
+                <textarea id="emailTemplate" class="textarea-field" readonly>
+Subject: Complete Your Ess-a-Bagel Training
+
+Hi [Employee Name],
+
+Please complete your mandatory training by accessing the link below:
+
+[TRAINING_LINK]
+
+Instructions:
+1. Click the link above
+2. Enter your Employee ID and information
+3. Complete all training modules
+4. Contact your manager if you need assistance
+
+This training is required for all employees and must be completed by [DATE].
+
+Thank you!
+[Manager Name]
+                </textarea>
+                <button class="btn small" onclick="copyToClipboard('emailTemplate')">📋 Copy Email Template</button>
+            </div>
+        </div>
+        <button class="btn" onclick="closeShareModal()">Close</button>
+    </div>
+</div>
+
+<script>
+// Add these functions to the existing JavaScript
+
+function generateShareLink() {
+    var currentUrl = window.location.href;
+    document.getElementById('shareUrl').value = currentUrl;
+    document.getElementById('shareModal').style.display = 'flex';
+    updateDebug('Share link generated!');
+}
+
+function generateQRCode() {
+    var currentUrl = window.location.href;
+    var qrContainer = document.getElementById('qrCodeContainer');
+    
+    // Simple QR code using Google Charts API
+    var qrUrl = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' + encodeURIComponent(currentUrl);
+    qrContainer.innerHTML = '<img src="' + qrUrl + '" alt="QR Code for Training" style="border: 1px solid #ddd; padding: 10px;" />';
+    
+    document.getElementById('shareModal').style.display = 'flex';
+    updateDebug('QR code generated!');
+}
+
+function downloadTraining() {
+    // Create downloadable HTML file
+    var htmlContent = document.documentElement.outerHTML;
+    var blob = new Blob([htmlContent], { type: 'text/html' });
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ess-a-bagel-training-system.html';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    updateDebug('Training file downloaded!');
+}
+
+function copyToClipboard(elementId) {
+    var element = document.getElementById(elementId);
+    element.select();
+    document.execCommand('copy');
+    alert('Copied to clipboard!');
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').style.display = 'none';
+}
+</script>
